@@ -1,3 +1,3 @@
-module github.com/hako/durafmt
+module github.com/Igorprostoff/rudurafmt
 
-go 1.11
+go 1.20
