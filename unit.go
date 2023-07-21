@@ -10,7 +10,7 @@ var DefaultUnitsCoder = UnitsCoder{":", ","}
 
 // Unit the pair of singular and plural units
 type Unit struct {
-	Singular, Plural string
+	Singular, TwoToFive, Plural string
 }
 
 // Units duration units
@@ -37,11 +37,11 @@ type UnitsCoder struct {
 
 // Encode encodes input Units to string
 // Examples with `UnitsCoder{PluralSep: ":", UnitsSep = ","}`
-// 	- singular and plural pair units: `"year:wers,week:weeks,day:days,hour:hours,minute:minutes,second:seconds,millisecond:millliseconds,microsecond:microsseconds"`
+//   - singular and plural pair units: `"year:wers,week:weeks,day:days,hour:hours,minute:minutes,second:seconds,millisecond:millliseconds,microsecond:microsseconds"`
 func (coder UnitsCoder) Encode(units Units) string {
 	var pairs = make([]string, 8)
 	for i, u := range units.Units() {
-		pairs[i] = u.Singular + coder.PluralSep + u.Plural
+		pairs[i] = u.Singular + coder.PluralSep + u.TwoToFive + coder.PluralSep + u.Plural
 	}
 	return strings.Join(pairs, coder.UnitsSep)
 }
@@ -49,15 +49,15 @@ func (coder UnitsCoder) Encode(units Units) string {
 // Decode decodes input string to Units.
 // The input must follow the following formats:
 // - Unit format (singular and plural pair)
-// 	- must singular (the plural receives 's' character as suffix)
-//	- singular and plural: separated by `PluralSep` char
-//		Example with char `":"`: `"year:year"` (english) or `"mês:meses"` (portuguese)
-// - Units format (pairs of  Year, Week, Day, Hour, Minute,
-//	Second, Millisecond and Microsecond units) separated by `UnitsSep` char
-// 	- Examples with `UnitsCoder{PluralSep: ":", UnitsSep = ","}`
-// 		- must singular units: `"year,week,day,hour,minute,second,millisecond,microsecond"`
-// 		- mixed units: `"year,week:weeks,day,hour,minute:minutes,second,millisecond,microsecond"`
-// 		- singular and plural pair units: `"year:wers,week:weeks,day:days,hour:hours,minute:minutes,second:seconds,millisecond:millliseconds,microsecond:microsseconds"`
+//   - must singular (the plural receives 's' character as suffix)
+//   - singular and plural: separated by `PluralSep` char
+//     Example with char `":"`: `"year:year"` (english) or `"mês:meses"` (portuguese)
+//   - Units format (pairs of  Year, Week, Day, Hour, Minute,
+//     Second, Millisecond and Microsecond units) separated by `UnitsSep` char
+//   - Examples with `UnitsCoder{PluralSep: ":", UnitsSep = ","}`
+//   - must singular units: `"year,week,day,hour,minute,second,millisecond,microsecond"`
+//   - mixed units: `"year,week:weeks,day,hour,minute:minutes,second,millisecond,microsecond"`
+//   - singular and plural pair units: `"year:wers,week:weeks,day:days,hour:hours,minute:minutes,second:seconds,millisecond:millliseconds,microsecond:microsseconds"`
 func (coder UnitsCoder) Decode(s string) (units Units, err error) {
 	parts := strings.Split(s, coder.UnitsSep)
 	if len(parts) != 8 {
@@ -73,6 +73,8 @@ func (coder UnitsCoder) Decode(s string) (units Units, err error) {
 			u.Singular, u.Plural = ps[0], ps[0]+"s"
 		case 2:
 			u.Singular, u.Plural = ps[0], ps[1]
+		case 3:
+			u.Singular, u.TwoToFive, u.Plural = ps[0], ps[1], ps[2]
 		default:
 			err = fmt.Errorf("bad unit %q pair length", name)
 			return false

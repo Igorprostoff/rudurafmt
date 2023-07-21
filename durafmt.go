@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	units, _   = DefaultUnitsCoder.Decode("year,week,day,hour,minute,second,millisecond,microsecond")
+	units, _   = DefaultUnitsCoder.Decode("год:года:лет,неделя:недели:недель,день:дня:дней,час:часа:часов,минута:минуты:минут,секунда:секунды:секунд,миллисекунда:миллисекунды:миллисекунд,микросекунда:микросекунды:микросекунд")
 	unitsShort = []string{"y", "w", "d", "h", "m", "s", "ms", "µs"}
 )
 
@@ -111,43 +111,43 @@ func (d *Durafmt) Format(units Units) string {
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "years" || shouldConvert {
+	if d.limitUnit == "годы" || shouldConvert {
 		years = remainingSecondsToConvert / (365 * 24 * 3600 * 1000000)
 		remainingSecondsToConvert -= years * 365 * 24 * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "weeks" || shouldConvert {
+	if d.limitUnit == "недели" || shouldConvert {
 		weeks = remainingSecondsToConvert / (7 * 24 * 3600 * 1000000)
 		remainingSecondsToConvert -= weeks * 7 * 24 * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "days" || shouldConvert {
+	if d.limitUnit == "дни" || shouldConvert {
 		days = remainingSecondsToConvert / (24 * 3600 * 1000000)
 		remainingSecondsToConvert -= days * 24 * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "hours" || shouldConvert {
+	if d.limitUnit == "часы" || shouldConvert {
 		hours = remainingSecondsToConvert / (3600 * 1000000)
 		remainingSecondsToConvert -= hours * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "minutes" || shouldConvert {
+	if d.limitUnit == "минуты" || shouldConvert {
 		minutes = remainingSecondsToConvert / (60 * 1000000)
 		remainingSecondsToConvert -= minutes * 60 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "seconds" || shouldConvert {
+	if d.limitUnit == "секунды" || shouldConvert {
 		seconds = remainingSecondsToConvert / 1000000
 		remainingSecondsToConvert -= seconds * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "milliseconds" || shouldConvert {
+	if d.limitUnit == "миллисекунды" || shouldConvert {
 		milliseconds = remainingSecondsToConvert / 1000
 		remainingSecondsToConvert -= milliseconds * 1000
 	}
@@ -171,12 +171,16 @@ func (d *Durafmt) Format(units Units) string {
 		v := durationMap[7-i]
 		strval := strconv.FormatInt(v, 10)
 		switch {
-		// add to the duration string if v > 1.
+		case v > 1 && v < 5:
+			duration += strval + " " + u.TwoToFive + " "
+		case v > 11 && v%10 < 5 && v%10 > 1 && (v%100 > 20 || v%100 < 10):
+			duration += strval + " " + u.TwoToFive + " "
+		// remove the plural 's', if v is 1.
+		case v%10 == 1 && v != 11:
+			duration += strval + " " + u.Singular + " "
+			// add to the duration string if v > 1.
 		case v > 1:
 			duration += strval + " " + u.Plural + " "
-		// remove the plural 's', if v is 1.
-		case v == 1:
-			duration += strval + " " + u.Singular + " "
 		// omit any value with 0s or 0.
 		case d.duration.String() == "0" || d.duration.String() == "0s":
 			pattern := fmt.Sprintf("^-?0%s$", unitsShort[i])
@@ -234,43 +238,43 @@ func (d *Durafmt) InternationalString() string {
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "years" || shouldConvert {
+	if d.limitUnit == "годы" || shouldConvert {
 		years = remainingSecondsToConvert / (365 * 24 * 3600 * 1000000)
 		remainingSecondsToConvert -= years * 365 * 24 * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "weeks" || shouldConvert {
+	if d.limitUnit == "недели" || shouldConvert {
 		weeks = remainingSecondsToConvert / (7 * 24 * 3600 * 1000000)
 		remainingSecondsToConvert -= weeks * 7 * 24 * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "days" || shouldConvert {
+	if d.limitUnit == "дни" || shouldConvert {
 		days = remainingSecondsToConvert / (24 * 3600 * 1000000)
 		remainingSecondsToConvert -= days * 24 * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "hours" || shouldConvert {
+	if d.limitUnit == "часы" || shouldConvert {
 		hours = remainingSecondsToConvert / (3600 * 1000000)
 		remainingSecondsToConvert -= hours * 3600 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "minutes" || shouldConvert {
+	if d.limitUnit == "минуты" || shouldConvert {
 		minutes = remainingSecondsToConvert / (60 * 1000000)
 		remainingSecondsToConvert -= minutes * 60 * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "seconds" || shouldConvert {
+	if d.limitUnit == "секунды" || shouldConvert {
 		seconds = remainingSecondsToConvert / 1000000
 		remainingSecondsToConvert -= seconds * 1000000
 		shouldConvert = true
 	}
 
-	if d.limitUnit == "milliseconds" || shouldConvert {
+	if d.limitUnit == "миллисекунды" || shouldConvert {
 		milliseconds = remainingSecondsToConvert / 1000
 		remainingSecondsToConvert -= milliseconds * 1000
 	}
